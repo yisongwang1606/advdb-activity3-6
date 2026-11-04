@@ -2,7 +2,11 @@
 
 DBAD 4000 — Group 6
 
+Seth Garciano, Tristin Bates, Troy Franks, Yisong Wang
+
 A streaming database using PostgreSQL 18.6 and pgvector 0.8.7. It contains 24 synthetic users, 144 activity events, 60 titles and 5 search phrases. Title and phrase embeddings have 384 dimensions and use `all-MiniLM-L6-v2`.
+
+[Report (PDF)](report/Class%20Activity%20JSONB%20and%20Vector%20Databases%20Document.pdf) · [Database diagram (PDF)](docs/CA3_Database_Diagram.pdf) · [Editable diagram](docs/CA3_Database_Diagram.drawio)
 
 ## Files
 
@@ -12,7 +16,7 @@ A streaming database using PostgreSQL 18.6 and pgvector 0.8.7. It contains 24 sy
 | `notebooks/` | Executed instructor notebook, title CSV and Python dependencies |
 | `results/` | Actual query outputs in CSV and text, execution evidence and query plans |
 | `docs/` | Editable draw.io database diagram, diagram PDF and Windows pgvector setup instructions |
-| `report/` | [Class activity report (PDF)](report/Class%20Activity%20JSONB%20and%20Vector%20Databases%20Document.pdf) |
+| `report/` | Report covering the design, six queries and results, scalability and team contributions; query page previews |
 | `scripts/` | Synthetic data generator and document generation script |
 
 ## Run
@@ -36,14 +40,33 @@ Alternatively, run from the repository folder with psql:
 
 The six queries cover JSONB containment, numeric aggregation, array expansion, phrase similarity, title similarity and recommendations excluding watched titles. [Saved results](results/query_results.txt) and [validation evidence](results/validation.json) record the successful database run.
 
-Example output for **something scary in the woods**:
+## Query result previews
 
-| Title | Cosine distance |
-| --- | --- |
-| The Woods Remember | 0.602 |
-| After Dark | 0.638 |
-| Little Fox Detectives | 0.648 |
-| The Missing Hour | 0.666 |
-| Wild Kitchen | 0.671 |
+The following images are pages from the report showing the SQL and recorded PostgreSQL results.
+
+<details>
+<summary>View all six queries and results</summary>
+
+**Query 1 — JSONB containment**
+
+![Query 1 SQL and results from report page 2](report/previews/query-page-2.png)
+
+**Query 2 — Viewing minutes**
+
+![Query 2 SQL and results from report page 3](report/previews/query-page-3.png)
+
+**Query 3 — Favourite genres**
+
+![Query 3 SQL and results from report page 4](report/previews/query-page-4.png)
+
+**Queries 4 and 5 — Phrase and title similarity**
+
+![Queries 4 and 5 SQL and results from report page 5](report/previews/query-page-5.png)
+
+**Query 6 — Recommendations excluding watched titles**
+
+![Query 6 SQL and results from report page 6](report/previews/query-page-6.png)
+
+</details>
 
 The notebook and catalogue are instructor-supplied. Setup, SQL, synthetic data and documentation were prepared with Codex assistance.
