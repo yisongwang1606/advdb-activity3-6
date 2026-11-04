@@ -1,0 +1,7 @@
+# DBAD 4000 · Class Activity 3 · the libraries ca3_make_embeddings_vscode.ipynb needs.
+# VS Code installs these for you (Making the Embeddings, Step 2, Route B, step d):
+# Python: Create Environment -> Venv -> Python 3.12 -> tick this file.
+# Up to about 2 GB, mostly PyTorch, which sentence-transformers uses to run the model.
+sentence-transformers>=3.0
+pandas>=2.0
+ipykernel

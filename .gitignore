@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep the final report PDF local, as requested.
+/docs/CA3_Report_Group6.pdf
+/docs/CA3_Report_Group6.docx

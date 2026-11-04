@@ -1,0 +1,816 @@
+{
+  "port": 5432,
+  "counts": {
+    "users": 24,
+    "events": 144,
+    "titles": 60,
+    "phrases": 5
+  },
+  "indexes": [
+    {
+      "indexdef": "CREATE INDEX activity_event_data_gin ON public.activity_logs USING gin (event_data)",
+      "indexname": "activity_event_data_gin",
+      "tablename": "activity_logs"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX activity_logs_pkey ON public.activity_logs USING btree (activity_id)",
+      "indexname": "activity_logs_pkey",
+      "tablename": "activity_logs"
+    },
+    {
+      "indexdef": "CREATE INDEX activity_title_idx ON public.activity_logs USING btree (title_id)",
+      "indexname": "activity_title_idx",
+      "tablename": "activity_logs"
+    },
+    {
+      "indexdef": "CREATE INDEX activity_user_time_idx ON public.activity_logs USING btree (user_id, occurred_at DESC, activity_id DESC)",
+      "indexname": "activity_user_time_idx",
+      "tablename": "activity_logs"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX search_phrases_pkey ON public.search_phrases USING btree (phrase_id)",
+      "indexname": "search_phrases_pkey",
+      "tablename": "search_phrases"
+    },
+    {
+      "indexdef": "CREATE INDEX titles_embedding_idx ON public.titles USING hnsw (embedding vector_cosine_ops)",
+      "indexname": "titles_embedding_idx",
+      "tablename": "titles"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX titles_pkey ON public.titles USING btree (title_id)",
+      "indexname": "titles_pkey",
+      "tablename": "titles"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)",
+      "indexname": "users_email_key",
+      "tablename": "users"
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (user_id)",
+      "indexname": "users_pkey",
+      "tablename": "users"
+    },
+    {
+      "indexdef": "CREATE INDEX users_preferences_gin ON public.users USING gin (preferences)",
+      "indexname": "users_preferences_gin",
+      "tablename": "users"
+    }
+  ],
+  "results": [
+    {
+      "sql": "SELECT user_id, full_name, plan,\n       preferences -> 'favourite_genres' AS favourite_genres\nFROM users\nWHERE preferences @> '{\"favourite_genres\":[\"Mystery\"]}'::jsonb\nORDER BY user_id;",
+      "rows": [
+        {
+          "plan": "Basic",
+          "user_id": 1,
+          "full_name": "Alex Morgan",
+          "favourite_genres": [
+            "Mystery",
+            "Sci-fi"
+          ]
+        },
+        {
+          "plan": "Standard",
+          "user_id": 8,
+          "full_name": "Avery Singh",
+          "favourite_genres": [
+            "Reality",
+            "Mystery"
+          ]
+        },
+        {
+          "plan": "Premium",
+          "user_id": 9,
+          "full_name": "Quinn Martin",
+          "favourite_genres": [
+            "Mystery",
+            "Sci-fi"
+          ]
+        },
+        {
+          "plan": "Basic",
+          "user_id": 16,
+          "full_name": "Finley Adams",
+          "favourite_genres": [
+            "Reality",
+            "Mystery"
+          ]
+        },
+        {
+          "plan": "Standard",
+          "user_id": 17,
+          "full_name": "Harper Evans",
+          "favourite_genres": [
+            "Mystery",
+            "Sci-fi"
+          ]
+        },
+        {
+          "plan": "Premium",
+          "user_id": 24,
+          "full_name": "Payton Ward",
+          "favourite_genres": [
+            "Reality",
+            "Mystery"
+          ]
+        }
+      ],
+      "slug": "01_jsonb_containment",
+      "title": "Users who like Mystery"
+    },
+    {
+      "sql": "SELECT t.title_id, t.title,\n       sum((a.event_data ->> 'minutes_watched')::numeric) AS total_minutes,\n       count(*) AS play_events\nFROM activity_logs a\nJOIN titles t ON t.title_id = a.title_id\nWHERE a.event_data @> '{\"event_type\":\"play\"}'::jsonb\nGROUP BY t.title_id, t.title\nORDER BY total_minutes DESC, t.title_id\nLIMIT 10;",
+      "rows": [
+        {
+          "title": "Fourth Quarter",
+          "title_id": 11,
+          "play_events": 2,
+          "total_minutes": 116
+        },
+        {
+          "title": "The Glass Orchard",
+          "title_id": 8,
+          "play_events": 2,
+          "total_minutes": 112
+        },
+        {
+          "title": "Under the Canopy",
+          "title_id": 5,
+          "play_events": 2,
+          "total_minutes": 108
+        },
+        {
+          "title": "Iron Meridian",
+          "title_id": 12,
+          "play_events": 2,
+          "total_minutes": 108
+        },
+        {
+          "title": "Hollow Pines",
+          "title_id": 9,
+          "play_events": 2,
+          "total_minutes": 106
+        },
+        {
+          "title": "Orbit of Ash",
+          "title_id": 2,
+          "play_events": 2,
+          "total_minutes": 104
+        },
+        {
+          "title": "Midnight Ledger",
+          "title_id": 6,
+          "play_events": 2,
+          "total_minutes": 104
+        },
+        {
+          "title": "Crumb & Clue",
+          "title_id": 3,
+          "play_events": 2,
+          "total_minutes": 102
+        },
+        {
+          "title": "After Dark",
+          "title_id": 59,
+          "play_events": 1,
+          "total_minutes": 70
+        },
+        {
+          "title": "Starward Academy",
+          "title_id": 10,
+          "play_events": 2,
+          "total_minutes": 68
+        }
+      ],
+      "slug": "02_jsonb_aggregation",
+      "title": "Top ten titles by recorded viewing minutes"
+    },
+    {
+      "sql": "SELECT g.genre, count(*) AS users_with_genre\nFROM users u\nCROSS JOIN LATERAL jsonb_array_elements_text(\n    u.preferences -> 'favourite_genres'\n) AS g(genre)\nGROUP BY g.genre\nORDER BY users_with_genre DESC, g.genre;",
+      "rows": [
+        {
+          "genre": "Animation",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Comedy",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Documentary",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Drama",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Horror",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Mystery",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Reality",
+          "users_with_genre": 6
+        },
+        {
+          "genre": "Sci-fi",
+          "users_with_genre": 6
+        }
+      ],
+      "slug": "03_jsonb_array",
+      "title": "Favourite genres across users"
+    },
+    {
+      "sql": "SELECT t.title_id, t.title, t.genre,\n       round((t.embedding <=> p.embedding)::numeric, 3) AS cosine_distance\nFROM titles t\nCROSS JOIN search_phrases p\nWHERE p.phrase_id = 4\nORDER BY t.embedding <=> p.embedding, t.title_id\nLIMIT 5;",
+      "rows": [
+        {
+          "genre": "Horror",
+          "title": "The Woods Remember",
+          "title_id": 56,
+          "cosine_distance": 0.602
+        },
+        {
+          "genre": "Documentary",
+          "title": "After Dark",
+          "title_id": 59,
+          "cosine_distance": 0.638
+        },
+        {
+          "genre": "Animation",
+          "title": "Little Fox Detectives",
+          "title_id": 25,
+          "cosine_distance": 0.648
+        },
+        {
+          "genre": "Mystery",
+          "title": "The Missing Hour",
+          "title_id": 51,
+          "cosine_distance": 0.666
+        },
+        {
+          "genre": "Food & Travel",
+          "title": "Wild Kitchen",
+          "title_id": 31,
+          "cosine_distance": 0.671
+        }
+      ],
+      "slug": "04_vector_phrase",
+      "title": "Five matches for something scary in the woods"
+    },
+    {
+      "sql": "SELECT t.title_id, t.title, t.genre,\n       round((t.embedding <=> seed.embedding)::numeric, 3) AS cosine_distance\nFROM titles t\nCROSS JOIN titles seed\nWHERE seed.title_id = 3 AND t.title_id <> seed.title_id\nORDER BY t.embedding <=> seed.embedding, t.title_id\nLIMIT 5;",
+      "rows": [
+        {
+          "genre": "Fantasy",
+          "title": "Small Town Spells",
+          "title_id": 43,
+          "cosine_distance": 0.572
+        },
+        {
+          "genre": "Crime",
+          "title": "Thin Blue Lies",
+          "title_id": 14,
+          "cosine_distance": 0.629
+        },
+        {
+          "genre": "Thriller",
+          "title": "Signal Lost",
+          "title_id": 17,
+          "cosine_distance": 0.67
+        },
+        {
+          "genre": "Historical Drama",
+          "title": "The Cartographer's Daughter",
+          "title_id": 48,
+          "cosine_distance": 0.677
+        },
+        {
+          "genre": "Drama",
+          "title": "Northern Lights Diner",
+          "title_id": 39,
+          "cosine_distance": 0.68
+        }
+      ],
+      "slug": "05_vector_similar_title",
+      "title": "Five titles like Crumb & Clue"
+    },
+    {
+      "sql": "WITH last_watched AS (\n    SELECT title_id\n    FROM activity_logs\n    WHERE user_id = 1\n      AND event_data @> '{\"event_type\":\"play\"}'::jsonb\n    ORDER BY occurred_at DESC, activity_id DESC\n    LIMIT 1\n)\nSELECT t.title_id, t.title, t.genre,\n       round((t.embedding <=> seed.embedding)::numeric, 3) AS cosine_distance\nFROM last_watched lw\nJOIN titles seed ON seed.title_id = lw.title_id\nCROSS JOIN titles t\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM activity_logs watched\n    WHERE watched.user_id = 1\n      AND watched.title_id = t.title_id\n      AND watched.event_data @> '{\"event_type\":\"play\"}'::jsonb\n)\nORDER BY t.embedding <=> seed.embedding, t.title_id\nLIMIT 5;",
+      "rows": [
+        {
+          "genre": "Fantasy",
+          "title": "Small Town Spells",
+          "title_id": 43,
+          "cosine_distance": 0.572
+        },
+        {
+          "genre": "Crime",
+          "title": "Thin Blue Lies",
+          "title_id": 14,
+          "cosine_distance": 0.629
+        },
+        {
+          "genre": "Thriller",
+          "title": "Signal Lost",
+          "title_id": 17,
+          "cosine_distance": 0.67
+        },
+        {
+          "genre": "Historical Drama",
+          "title": "The Cartographer's Daughter",
+          "title_id": 48,
+          "cosine_distance": 0.677
+        },
+        {
+          "genre": "Drama",
+          "title": "Northern Lights Diner",
+          "title_id": 39,
+          "cosine_distance": 0.68
+        }
+      ],
+      "slug": "06_vector_filtered",
+      "title": "Recommendations for user 1 excluding watched titles"
+    }
+  ],
+  "runtime": "Native Windows PostgreSQL via pgAdmin",
+  "database": "ca3_streaming",
+  "versions": {
+    "pgvector_version": "0.8.7",
+    "postgres_version": "18.6"
+  },
+  "guide_test": [
+    {
+      "id": 1,
+      "cosine_distance": 0.0
+    },
+    {
+      "id": 3,
+      "cosine_distance": 0.0085
+    },
+    {
+      "id": 2,
+      "cosine_distance": 0.2857
+    }
+  ],
+  "query_plans": [
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Alias": "users",
+                "Filter": "(preferences @> '{\"favourite_genres\": [\"Mystery\"]}'::jsonb)",
+                "Disabled": false,
+                "Node Type": "Seq Scan",
+                "Async Capable": false,
+                "Relation Name": "users",
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Sort Key": [
+              "user_id"
+            ],
+            "Node Type": "Sort",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 1
+    },
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "a",
+                            "Filter": "(event_data @> '{\"event_type\": \"play\"}'::jsonb)",
+                            "Disabled": false,
+                            "Node Type": "Seq Scan",
+                            "Async Capable": false,
+                            "Relation Name": "activity_logs",
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Outer"
+                          },
+                          {
+                            "Plans": [
+                              {
+                                "Alias": "t",
+                                "Disabled": false,
+                                "Node Type": "Seq Scan",
+                                "Async Capable": false,
+                                "Relation Name": "titles",
+                                "Parallel Aware": false,
+                                "Parent Relationship": "Outer"
+                              }
+                            ],
+                            "Disabled": false,
+                            "Node Type": "Hash",
+                            "Async Capable": false,
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Inner"
+                          }
+                        ],
+                        "Disabled": false,
+                        "Hash Cond": "(a.title_id = t.title_id)",
+                        "Join Type": "Inner",
+                        "Node Type": "Hash Join",
+                        "Inner Unique": true,
+                        "Async Capable": false,
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Outer"
+                      }
+                    ],
+                    "Disabled": false,
+                    "Strategy": "Hashed",
+                    "Group Key": [
+                      "t.title_id"
+                    ],
+                    "Node Type": "Aggregate",
+                    "Partial Mode": "Simple",
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Parent Relationship": "Outer"
+                  }
+                ],
+                "Disabled": false,
+                "Sort Key": [
+                  "(sum(((a.event_data ->> 'minutes_watched'::text))::numeric)) DESC",
+                  "t.title_id"
+                ],
+                "Node Type": "Sort",
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Node Type": "Limit",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 2
+    },
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Alias": "u",
+                        "Disabled": false,
+                        "Node Type": "Seq Scan",
+                        "Async Capable": false,
+                        "Relation Name": "users",
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Outer"
+                      },
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "g",
+                            "Disabled": false,
+                            "Node Type": "Function Scan",
+                            "Async Capable": false,
+                            "Function Name": "jsonb_array_elements_text",
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Outer"
+                          }
+                        ],
+                        "Disabled": false,
+                        "Cache Key": "u.preferences",
+                        "Node Type": "Memoize",
+                        "Cache Mode": "binary",
+                        "Async Capable": false,
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Inner"
+                      }
+                    ],
+                    "Disabled": false,
+                    "Join Type": "Inner",
+                    "Node Type": "Nested Loop",
+                    "Inner Unique": false,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Parent Relationship": "Outer"
+                  }
+                ],
+                "Disabled": false,
+                "Strategy": "Hashed",
+                "Group Key": [
+                  "g.genre"
+                ],
+                "Node Type": "Aggregate",
+                "Partial Mode": "Simple",
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Sort Key": [
+              "(count(*)) DESC",
+              "g.genre"
+            ],
+            "Node Type": "Sort",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 3
+    },
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Alias": "p",
+                        "Filter": "(phrase_id = 4)",
+                        "Disabled": false,
+                        "Node Type": "Seq Scan",
+                        "Async Capable": false,
+                        "Relation Name": "search_phrases",
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Outer"
+                      },
+                      {
+                        "Alias": "t",
+                        "Disabled": false,
+                        "Node Type": "Seq Scan",
+                        "Async Capable": false,
+                        "Relation Name": "titles",
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Inner"
+                      }
+                    ],
+                    "Disabled": false,
+                    "Join Type": "Inner",
+                    "Node Type": "Nested Loop",
+                    "Inner Unique": false,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Parent Relationship": "Outer"
+                  }
+                ],
+                "Disabled": false,
+                "Sort Key": [
+                  "((t.embedding <=> p.embedding))",
+                  "t.title_id"
+                ],
+                "Node Type": "Sort",
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Node Type": "Limit",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 4
+    },
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Alias": "seed",
+                        "Disabled": false,
+                        "Node Type": "Index Scan",
+                        "Index Cond": "(title_id = 3)",
+                        "Index Name": "titles_pkey",
+                        "Async Capable": false,
+                        "Relation Name": "titles",
+                        "Parallel Aware": false,
+                        "Scan Direction": "Forward",
+                        "Parent Relationship": "Outer"
+                      },
+                      {
+                        "Alias": "t",
+                        "Disabled": false,
+                        "Node Type": "Seq Scan",
+                        "Async Capable": false,
+                        "Relation Name": "titles",
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Inner"
+                      }
+                    ],
+                    "Disabled": false,
+                    "Join Type": "Inner",
+                    "Node Type": "Nested Loop",
+                    "Join Filter": "(t.title_id <> seed.title_id)",
+                    "Inner Unique": false,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Parent Relationship": "Outer"
+                  }
+                ],
+                "Disabled": false,
+                "Sort Key": [
+                  "((t.embedding <=> seed.embedding))",
+                  "t.title_id"
+                ],
+                "Node Type": "Sort",
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Node Type": "Limit",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 5
+    },
+    {
+      "plan": [
+        {
+          "Plan": {
+            "Plans": [
+              {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Plans": [
+                              {
+                                "Plans": [
+                                  {
+                                    "Alias": "activity_logs",
+                                    "Filter": "(event_data @> '{\"event_type\": \"play\"}'::jsonb)",
+                                    "Disabled": false,
+                                    "Node Type": "Index Scan",
+                                    "Index Cond": "(user_id = 1)",
+                                    "Index Name": "activity_user_time_idx",
+                                    "Async Capable": false,
+                                    "Relation Name": "activity_logs",
+                                    "Parallel Aware": false,
+                                    "Scan Direction": "Forward",
+                                    "Parent Relationship": "Outer"
+                                  }
+                                ],
+                                "Disabled": false,
+                                "Node Type": "Limit",
+                                "Async Capable": false,
+                                "Parallel Aware": false,
+                                "Parent Relationship": "Outer"
+                              },
+                              {
+                                "Alias": "seed",
+                                "Disabled": false,
+                                "Node Type": "Index Scan",
+                                "Index Cond": "(title_id = activity_logs.title_id)",
+                                "Index Name": "titles_pkey",
+                                "Async Capable": false,
+                                "Relation Name": "titles",
+                                "Parallel Aware": false,
+                                "Scan Direction": "Forward",
+                                "Parent Relationship": "Inner"
+                              }
+                            ],
+                            "Disabled": false,
+                            "Join Type": "Inner",
+                            "Node Type": "Nested Loop",
+                            "Inner Unique": true,
+                            "Async Capable": false,
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Outer"
+                          },
+                          {
+                            "Alias": "t",
+                            "Disabled": false,
+                            "Node Type": "Seq Scan",
+                            "Async Capable": false,
+                            "Relation Name": "titles",
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Inner"
+                          }
+                        ],
+                        "Disabled": false,
+                        "Join Type": "Inner",
+                        "Node Type": "Nested Loop",
+                        "Inner Unique": false,
+                        "Async Capable": false,
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Outer"
+                      },
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "watched",
+                            "Filter": "((event_data @> '{\"event_type\": \"play\"}'::jsonb) AND (user_id = 1))",
+                            "Disabled": false,
+                            "Node Type": "Seq Scan",
+                            "Async Capable": false,
+                            "Relation Name": "activity_logs",
+                            "Parallel Aware": false,
+                            "Parent Relationship": "Outer"
+                          }
+                        ],
+                        "Disabled": false,
+                        "Node Type": "Hash",
+                        "Async Capable": false,
+                        "Parallel Aware": false,
+                        "Parent Relationship": "Inner"
+                      }
+                    ],
+                    "Disabled": false,
+                    "Hash Cond": "(t.title_id = watched.title_id)",
+                    "Join Type": "Anti",
+                    "Node Type": "Hash Join",
+                    "Inner Unique": false,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Parent Relationship": "Outer"
+                  }
+                ],
+                "Disabled": false,
+                "Sort Key": [
+                  "((t.embedding <=> seed.embedding))",
+                  "t.title_id"
+                ],
+                "Node Type": "Sort",
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Parent Relationship": "Outer"
+              }
+            ],
+            "Disabled": false,
+            "Node Type": "Limit",
+            "Async Capable": false,
+            "Parallel Aware": false
+          }
+        }
+      ],
+      "query_number": 6
+    }
+  ],
+  "event_counts": [
+    {
+      "type": "pause",
+      "count": 24
+    },
+    {
+      "type": "play",
+      "count": 72
+    },
+    {
+      "type": "rate",
+      "count": 24
+    },
+    {
+      "type": "search",
+      "count": 24
+    }
+  ],
+  "orphan_events": 0,
+  "executed_at_utc": "2026-11-03 18:31:23 UTC",
+  "vector_validation": {
+    "max_dimensions": 384,
+    "min_dimensions": 384,
+    "nonnull_vectors": 60
+  },
+  "negative_checks_passed": 4,
+  "missing_preference_arrays": 0
+}

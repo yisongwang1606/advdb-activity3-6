@@ -1,0 +1,319 @@
+Actual PostgreSQL results | 2026-11-03 18:31:23 UTC
+Native Windows PostgreSQL 18.6; pgvector 0.8.7; database ca3_streaming; port 5432.
+
+Users who like Mystery
+SELECT user_id, full_name, plan,
+       preferences -> 'favourite_genres' AS favourite_genres
+FROM users
+WHERE preferences @> '{"favourite_genres":["Mystery"]}'::jsonb
+ORDER BY user_id;
+[
+  {
+    "plan": "Basic",
+    "user_id": 1,
+    "full_name": "Alex Morgan",
+    "favourite_genres": [
+      "Mystery",
+      "Sci-fi"
+    ]
+  },
+  {
+    "plan": "Standard",
+    "user_id": 8,
+    "full_name": "Avery Singh",
+    "favourite_genres": [
+      "Reality",
+      "Mystery"
+    ]
+  },
+  {
+    "plan": "Premium",
+    "user_id": 9,
+    "full_name": "Quinn Martin",
+    "favourite_genres": [
+      "Mystery",
+      "Sci-fi"
+    ]
+  },
+  {
+    "plan": "Basic",
+    "user_id": 16,
+    "full_name": "Finley Adams",
+    "favourite_genres": [
+      "Reality",
+      "Mystery"
+    ]
+  },
+  {
+    "plan": "Standard",
+    "user_id": 17,
+    "full_name": "Harper Evans",
+    "favourite_genres": [
+      "Mystery",
+      "Sci-fi"
+    ]
+  },
+  {
+    "plan": "Premium",
+    "user_id": 24,
+    "full_name": "Payton Ward",
+    "favourite_genres": [
+      "Reality",
+      "Mystery"
+    ]
+  }
+]
+
+Top ten titles by recorded viewing minutes
+SELECT t.title_id, t.title,
+       sum((a.event_data ->> 'minutes_watched')::numeric) AS total_minutes,
+       count(*) AS play_events
+FROM activity_logs a
+JOIN titles t ON t.title_id = a.title_id
+WHERE a.event_data @> '{"event_type":"play"}'::jsonb
+GROUP BY t.title_id, t.title
+ORDER BY total_minutes DESC, t.title_id
+LIMIT 10;
+[
+  {
+    "title": "Fourth Quarter",
+    "title_id": 11,
+    "play_events": 2,
+    "total_minutes": 116
+  },
+  {
+    "title": "The Glass Orchard",
+    "title_id": 8,
+    "play_events": 2,
+    "total_minutes": 112
+  },
+  {
+    "title": "Under the Canopy",
+    "title_id": 5,
+    "play_events": 2,
+    "total_minutes": 108
+  },
+  {
+    "title": "Iron Meridian",
+    "title_id": 12,
+    "play_events": 2,
+    "total_minutes": 108
+  },
+  {
+    "title": "Hollow Pines",
+    "title_id": 9,
+    "play_events": 2,
+    "total_minutes": 106
+  },
+  {
+    "title": "Orbit of Ash",
+    "title_id": 2,
+    "play_events": 2,
+    "total_minutes": 104
+  },
+  {
+    "title": "Midnight Ledger",
+    "title_id": 6,
+    "play_events": 2,
+    "total_minutes": 104
+  },
+  {
+    "title": "Crumb & Clue",
+    "title_id": 3,
+    "play_events": 2,
+    "total_minutes": 102
+  },
+  {
+    "title": "After Dark",
+    "title_id": 59,
+    "play_events": 1,
+    "total_minutes": 70
+  },
+  {
+    "title": "Starward Academy",
+    "title_id": 10,
+    "play_events": 2,
+    "total_minutes": 68
+  }
+]
+
+Favourite genres across users
+SELECT g.genre, count(*) AS users_with_genre
+FROM users u
+CROSS JOIN LATERAL jsonb_array_elements_text(
+    u.preferences -> 'favourite_genres'
+) AS g(genre)
+GROUP BY g.genre
+ORDER BY users_with_genre DESC, g.genre;
+[
+  {
+    "genre": "Animation",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Comedy",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Documentary",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Drama",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Horror",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Mystery",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Reality",
+    "users_with_genre": 6
+  },
+  {
+    "genre": "Sci-fi",
+    "users_with_genre": 6
+  }
+]
+
+Five matches for something scary in the woods
+SELECT t.title_id, t.title, t.genre,
+       round((t.embedding <=> p.embedding)::numeric, 3) AS cosine_distance
+FROM titles t
+CROSS JOIN search_phrases p
+WHERE p.phrase_id = 4
+ORDER BY t.embedding <=> p.embedding, t.title_id
+LIMIT 5;
+[
+  {
+    "genre": "Horror",
+    "title": "The Woods Remember",
+    "title_id": 56,
+    "cosine_distance": 0.602
+  },
+  {
+    "genre": "Documentary",
+    "title": "After Dark",
+    "title_id": 59,
+    "cosine_distance": 0.638
+  },
+  {
+    "genre": "Animation",
+    "title": "Little Fox Detectives",
+    "title_id": 25,
+    "cosine_distance": 0.648
+  },
+  {
+    "genre": "Mystery",
+    "title": "The Missing Hour",
+    "title_id": 51,
+    "cosine_distance": 0.666
+  },
+  {
+    "genre": "Food & Travel",
+    "title": "Wild Kitchen",
+    "title_id": 31,
+    "cosine_distance": 0.671
+  }
+]
+
+Five titles like Crumb & Clue
+SELECT t.title_id, t.title, t.genre,
+       round((t.embedding <=> seed.embedding)::numeric, 3) AS cosine_distance
+FROM titles t
+CROSS JOIN titles seed
+WHERE seed.title_id = 3 AND t.title_id <> seed.title_id
+ORDER BY t.embedding <=> seed.embedding, t.title_id
+LIMIT 5;
+[
+  {
+    "genre": "Fantasy",
+    "title": "Small Town Spells",
+    "title_id": 43,
+    "cosine_distance": 0.572
+  },
+  {
+    "genre": "Crime",
+    "title": "Thin Blue Lies",
+    "title_id": 14,
+    "cosine_distance": 0.629
+  },
+  {
+    "genre": "Thriller",
+    "title": "Signal Lost",
+    "title_id": 17,
+    "cosine_distance": 0.67
+  },
+  {
+    "genre": "Historical Drama",
+    "title": "The Cartographer's Daughter",
+    "title_id": 48,
+    "cosine_distance": 0.677
+  },
+  {
+    "genre": "Drama",
+    "title": "Northern Lights Diner",
+    "title_id": 39,
+    "cosine_distance": 0.68
+  }
+]
+
+Recommendations for user 1 excluding watched titles
+WITH last_watched AS (
+    SELECT title_id
+    FROM activity_logs
+    WHERE user_id = 1
+      AND event_data @> '{"event_type":"play"}'::jsonb
+    ORDER BY occurred_at DESC, activity_id DESC
+    LIMIT 1
+)
+SELECT t.title_id, t.title, t.genre,
+       round((t.embedding <=> seed.embedding)::numeric, 3) AS cosine_distance
+FROM last_watched lw
+JOIN titles seed ON seed.title_id = lw.title_id
+CROSS JOIN titles t
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM activity_logs watched
+    WHERE watched.user_id = 1
+      AND watched.title_id = t.title_id
+      AND watched.event_data @> '{"event_type":"play"}'::jsonb
+)
+ORDER BY t.embedding <=> seed.embedding, t.title_id
+LIMIT 5;
+[
+  {
+    "genre": "Fantasy",
+    "title": "Small Town Spells",
+    "title_id": 43,
+    "cosine_distance": 0.572
+  },
+  {
+    "genre": "Crime",
+    "title": "Thin Blue Lies",
+    "title_id": 14,
+    "cosine_distance": 0.629
+  },
+  {
+    "genre": "Thriller",
+    "title": "Signal Lost",
+    "title_id": 17,
+    "cosine_distance": 0.67
+  },
+  {
+    "genre": "Historical Drama",
+    "title": "The Cartographer's Daughter",
+    "title_id": 48,
+    "cosine_distance": 0.677
+  },
+  {
+    "genre": "Drama",
+    "title": "Northern Lights Diner",
+    "title_id": 39,
+    "cosine_distance": 0.68
+  }
+]

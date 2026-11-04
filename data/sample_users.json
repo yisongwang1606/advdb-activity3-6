@@ -1,0 +1,382 @@
+[
+  {
+    "user_id": 1,
+    "full_name": "Alex Morgan",
+    "email": "viewer01@example.com",
+    "country": "CA",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Mystery",
+        "Sci-fi"
+      ],
+      "subtitle_language": "en"
+    }
+  },
+  {
+    "user_id": 2,
+    "full_name": "Jordan Lee",
+    "email": "viewer02@example.com",
+    "country": "US",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Sci-fi",
+        "Comedy"
+      ],
+      "subtitle_language": "fr",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 3,
+    "full_name": "Taylor Chen",
+    "email": "viewer03@example.com",
+    "country": "GB",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "subtitle_language": "es",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      }
+    }
+  },
+  {
+    "user_id": 4,
+    "full_name": "Sam Rivera",
+    "email": "viewer04@example.com",
+    "country": "AU",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Drama",
+        "Horror"
+      ],
+      "subtitle_language": "zh",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 5,
+    "full_name": "Casey Patel",
+    "email": "viewer05@example.com",
+    "country": "CA",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Horror",
+        "Animation"
+      ],
+      "subtitle_language": "en"
+    }
+  },
+  {
+    "user_id": 6,
+    "full_name": "Riley Park",
+    "email": "viewer06@example.com",
+    "country": "US",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Animation",
+        "Documentary"
+      ],
+      "subtitle_language": "fr",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      },
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 7,
+    "full_name": "Jamie Wilson",
+    "email": "viewer07@example.com",
+    "country": "GB",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Documentary",
+        "Reality"
+      ],
+      "subtitle_language": "es"
+    }
+  },
+  {
+    "user_id": 8,
+    "full_name": "Avery Singh",
+    "email": "viewer08@example.com",
+    "country": "AU",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Reality",
+        "Mystery"
+      ],
+      "subtitle_language": "zh",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 9,
+    "full_name": "Quinn Martin",
+    "email": "viewer09@example.com",
+    "country": "CA",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Mystery",
+        "Sci-fi"
+      ],
+      "subtitle_language": "en",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      }
+    }
+  },
+  {
+    "user_id": 10,
+    "full_name": "Drew Nguyen",
+    "email": "viewer10@example.com",
+    "country": "US",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Sci-fi",
+        "Comedy"
+      ],
+      "subtitle_language": "fr",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 11,
+    "full_name": "Skyler Brooks",
+    "email": "viewer11@example.com",
+    "country": "GB",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "subtitle_language": "es"
+    }
+  },
+  {
+    "user_id": 12,
+    "full_name": "Reese Kim",
+    "email": "viewer12@example.com",
+    "country": "AU",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Drama",
+        "Horror"
+      ],
+      "subtitle_language": "zh",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      },
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 13,
+    "full_name": "Rowan Clark",
+    "email": "viewer13@example.com",
+    "country": "CA",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Horror",
+        "Animation"
+      ],
+      "subtitle_language": "en"
+    }
+  },
+  {
+    "user_id": 14,
+    "full_name": "Emery Scott",
+    "email": "viewer14@example.com",
+    "country": "US",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Animation",
+        "Documentary"
+      ],
+      "subtitle_language": "fr",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 15,
+    "full_name": "Parker Lewis",
+    "email": "viewer15@example.com",
+    "country": "GB",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Documentary",
+        "Reality"
+      ],
+      "subtitle_language": "es",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      }
+    }
+  },
+  {
+    "user_id": 16,
+    "full_name": "Finley Adams",
+    "email": "viewer16@example.com",
+    "country": "AU",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Reality",
+        "Mystery"
+      ],
+      "subtitle_language": "zh",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 17,
+    "full_name": "Harper Evans",
+    "email": "viewer17@example.com",
+    "country": "CA",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Mystery",
+        "Sci-fi"
+      ],
+      "subtitle_language": "en"
+    }
+  },
+  {
+    "user_id": 18,
+    "full_name": "Logan Diaz",
+    "email": "viewer18@example.com",
+    "country": "US",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Sci-fi",
+        "Comedy"
+      ],
+      "subtitle_language": "fr",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      },
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 19,
+    "full_name": "Cameron Reed",
+    "email": "viewer19@example.com",
+    "country": "GB",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "subtitle_language": "es"
+    }
+  },
+  {
+    "user_id": 20,
+    "full_name": "Blake Turner",
+    "email": "viewer20@example.com",
+    "country": "AU",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Drama",
+        "Horror"
+      ],
+      "subtitle_language": "zh",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 21,
+    "full_name": "Dakota Price",
+    "email": "viewer21@example.com",
+    "country": "CA",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Horror",
+        "Animation"
+      ],
+      "subtitle_language": "en",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      }
+    }
+  },
+  {
+    "user_id": 22,
+    "full_name": "Hayden Ross",
+    "email": "viewer22@example.com",
+    "country": "US",
+    "plan": "Basic",
+    "preferences": {
+      "favourite_genres": [
+        "Animation",
+        "Documentary"
+      ],
+      "subtitle_language": "fr",
+      "autoplay": false
+    }
+  },
+  {
+    "user_id": 23,
+    "full_name": "Kendall Bell",
+    "email": "viewer23@example.com",
+    "country": "GB",
+    "plan": "Standard",
+    "preferences": {
+      "favourite_genres": [
+        "Documentary",
+        "Reality"
+      ],
+      "subtitle_language": "es"
+    }
+  },
+  {
+    "user_id": 24,
+    "full_name": "Payton Ward",
+    "email": "viewer24@example.com",
+    "country": "AU",
+    "plan": "Premium",
+    "preferences": {
+      "favourite_genres": [
+        "Reality",
+        "Mystery"
+      ],
+      "subtitle_language": "zh",
+      "parental_controls": {
+        "enabled": true,
+        "maximum_rating": "PG"
+      },
+      "autoplay": false
+    }
+  }
+]

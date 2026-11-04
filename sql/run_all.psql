@@ -1,0 +1,10 @@
+\set ON_ERROR_STOP on
+\ir 00_pgvector_check.sql
+\ir ca3_titles_vectors.sql
+\ir ca3_search_phrases.sql
+\ir 01_schema.sql
+\ir 02_sample_data.sql
+ANALYZE;
+\ir 05_integrity_tests.sql
+\ir 03_queries.sql
+\ir 04_validation.sql

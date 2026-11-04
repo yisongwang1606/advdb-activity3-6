@@ -1,0 +1,4 @@
+# Preserve verified source bytes and checksums on all platforms.
+* -text
+*.pdf binary
+*.docx binary

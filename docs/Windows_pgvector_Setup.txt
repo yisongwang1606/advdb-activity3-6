@@ -1,0 +1,58 @@
+Native Windows pgvector installation record
+==========================================
+
+Verified on 2026-11-03:
+  PostgreSQL: 18.6 at C:\Program Files\PostgreSQL\18
+  Existing service: postgresql-x64-18
+  Connection: 127.0.0.1:5432
+  Activity database: ca3_streaming
+  Extension: vector, version 0.8.7
+  Source: https://github.com/pgvector/pgvector
+  Tag: v0.8.7
+  Commit: f37c13f68b57d2c3472b2214fbcff699d6d34876
+  Compiler: Microsoft Visual Studio 2022 Build Tools, x64 C++ tools
+  Windows SDK: Windows 11 SDK 10.0.26100
+
+The teacher's Windows guide was followed using its native source-build route.
+StackBuilder was opened first, but its package catalogue could not be confirmed
+through the UI. No claim is made that its catalogue lacked pgvector.
+
+The official source was compiled against PGROOT above with Makefile.win.
+47 extension DLL/control/SQL/header files were installed into that PostgreSQL
+installation, and the installed files were hash-checked against the build.
+The existing PostgreSQL service was started. No second PostgreSQL cluster or
+Docker instance was created for this activity.
+
+Reproduction on a suitable Windows computer
+-------------------------------------------
+Install PostgreSQL 18 and Visual Studio 2022 Build Tools with the C++ x64 tools
+and a Windows SDK from their official vendors. Then open an x64 Native Tools
+Command Prompt as administrator and run the official source-build steps below.
+Use a writable checkout directory and adjust PGROOT if PostgreSQL is elsewhere.
+
+  set "PGROOT=C:\Program Files\PostgreSQL\18"
+  git clone --branch v0.8.7 --depth 1 https://github.com/pgvector/pgvector.git
+  cd pgvector
+  nmake /F Makefile.win
+  nmake /F Makefile.win install
+
+The original machine used the same compiled file set with a PowerShell copy
+installer to permit explicit per-file hash verification; it did not use a
+third-party precompiled DLL.
+
+In pgAdmin connected to the target activity database:
+
+  SELECT * FROM pg_available_extensions WHERE name = 'vector';
+  CREATE EXTENSION IF NOT EXISTS vector;
+  SELECT extversion FROM pg_extension WHERE extname = 'vector';
+
+The teacher's complete type/distance/HNSW smoke test is sql/00_pgvector_check.sql.
+Actual result order: ID 1 = 0.0000; ID 3 = 0.0085; ID 2 = 0.2857.
+Enable the extension separately in each database where it is needed.
+
+Sources:
+  https://learn.sait.ca/d2l/le/lessons/886971/topics/22165630
+  https://github.com/pgvector/pgvector#windows
+  https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=visualstudio
+
+Prepared with AI assistance. No password or other authentication data is stored.

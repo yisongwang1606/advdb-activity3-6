@@ -1,0 +1,428 @@
+[
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Alias": "users",
+              "Filter": "(preferences @> '{\"favourite_genres\": [\"Mystery\"]}'::jsonb)",
+              "Disabled": false,
+              "Node Type": "Seq Scan",
+              "Async Capable": false,
+              "Relation Name": "users",
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Sort Key": [
+            "user_id"
+          ],
+          "Node Type": "Sort",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 1
+  },
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Plans": [
+                {
+                  "Plans": [
+                    {
+                      "Plans": [
+                        {
+                          "Alias": "a",
+                          "Filter": "(event_data @> '{\"event_type\": \"play\"}'::jsonb)",
+                          "Disabled": false,
+                          "Node Type": "Seq Scan",
+                          "Async Capable": false,
+                          "Relation Name": "activity_logs",
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Outer"
+                        },
+                        {
+                          "Plans": [
+                            {
+                              "Alias": "t",
+                              "Disabled": false,
+                              "Node Type": "Seq Scan",
+                              "Async Capable": false,
+                              "Relation Name": "titles",
+                              "Parallel Aware": false,
+                              "Parent Relationship": "Outer"
+                            }
+                          ],
+                          "Disabled": false,
+                          "Node Type": "Hash",
+                          "Async Capable": false,
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Inner"
+                        }
+                      ],
+                      "Disabled": false,
+                      "Hash Cond": "(a.title_id = t.title_id)",
+                      "Join Type": "Inner",
+                      "Node Type": "Hash Join",
+                      "Inner Unique": true,
+                      "Async Capable": false,
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Outer"
+                    }
+                  ],
+                  "Disabled": false,
+                  "Strategy": "Hashed",
+                  "Group Key": [
+                    "t.title_id"
+                  ],
+                  "Node Type": "Aggregate",
+                  "Partial Mode": "Simple",
+                  "Async Capable": false,
+                  "Parallel Aware": false,
+                  "Parent Relationship": "Outer"
+                }
+              ],
+              "Disabled": false,
+              "Sort Key": [
+                "(sum(((a.event_data ->> 'minutes_watched'::text))::numeric)) DESC",
+                "t.title_id"
+              ],
+              "Node Type": "Sort",
+              "Async Capable": false,
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Node Type": "Limit",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 2
+  },
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Plans": [
+                {
+                  "Plans": [
+                    {
+                      "Alias": "u",
+                      "Disabled": false,
+                      "Node Type": "Seq Scan",
+                      "Async Capable": false,
+                      "Relation Name": "users",
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Outer"
+                    },
+                    {
+                      "Plans": [
+                        {
+                          "Alias": "g",
+                          "Disabled": false,
+                          "Node Type": "Function Scan",
+                          "Async Capable": false,
+                          "Function Name": "jsonb_array_elements_text",
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Outer"
+                        }
+                      ],
+                      "Disabled": false,
+                      "Cache Key": "u.preferences",
+                      "Node Type": "Memoize",
+                      "Cache Mode": "binary",
+                      "Async Capable": false,
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Inner"
+                    }
+                  ],
+                  "Disabled": false,
+                  "Join Type": "Inner",
+                  "Node Type": "Nested Loop",
+                  "Inner Unique": false,
+                  "Async Capable": false,
+                  "Parallel Aware": false,
+                  "Parent Relationship": "Outer"
+                }
+              ],
+              "Disabled": false,
+              "Strategy": "Hashed",
+              "Group Key": [
+                "g.genre"
+              ],
+              "Node Type": "Aggregate",
+              "Partial Mode": "Simple",
+              "Async Capable": false,
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Sort Key": [
+            "(count(*)) DESC",
+            "g.genre"
+          ],
+          "Node Type": "Sort",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 3
+  },
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Plans": [
+                {
+                  "Plans": [
+                    {
+                      "Alias": "p",
+                      "Filter": "(phrase_id = 4)",
+                      "Disabled": false,
+                      "Node Type": "Seq Scan",
+                      "Async Capable": false,
+                      "Relation Name": "search_phrases",
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Outer"
+                    },
+                    {
+                      "Alias": "t",
+                      "Disabled": false,
+                      "Node Type": "Seq Scan",
+                      "Async Capable": false,
+                      "Relation Name": "titles",
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Inner"
+                    }
+                  ],
+                  "Disabled": false,
+                  "Join Type": "Inner",
+                  "Node Type": "Nested Loop",
+                  "Inner Unique": false,
+                  "Async Capable": false,
+                  "Parallel Aware": false,
+                  "Parent Relationship": "Outer"
+                }
+              ],
+              "Disabled": false,
+              "Sort Key": [
+                "((t.embedding <=> p.embedding))",
+                "t.title_id"
+              ],
+              "Node Type": "Sort",
+              "Async Capable": false,
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Node Type": "Limit",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 4
+  },
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Plans": [
+                {
+                  "Plans": [
+                    {
+                      "Alias": "seed",
+                      "Disabled": false,
+                      "Node Type": "Index Scan",
+                      "Index Cond": "(title_id = 3)",
+                      "Index Name": "titles_pkey",
+                      "Async Capable": false,
+                      "Relation Name": "titles",
+                      "Parallel Aware": false,
+                      "Scan Direction": "Forward",
+                      "Parent Relationship": "Outer"
+                    },
+                    {
+                      "Alias": "t",
+                      "Disabled": false,
+                      "Node Type": "Seq Scan",
+                      "Async Capable": false,
+                      "Relation Name": "titles",
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Inner"
+                    }
+                  ],
+                  "Disabled": false,
+                  "Join Type": "Inner",
+                  "Node Type": "Nested Loop",
+                  "Join Filter": "(t.title_id <> seed.title_id)",
+                  "Inner Unique": false,
+                  "Async Capable": false,
+                  "Parallel Aware": false,
+                  "Parent Relationship": "Outer"
+                }
+              ],
+              "Disabled": false,
+              "Sort Key": [
+                "((t.embedding <=> seed.embedding))",
+                "t.title_id"
+              ],
+              "Node Type": "Sort",
+              "Async Capable": false,
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Node Type": "Limit",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 5
+  },
+  {
+    "plan": [
+      {
+        "Plan": {
+          "Plans": [
+            {
+              "Plans": [
+                {
+                  "Plans": [
+                    {
+                      "Plans": [
+                        {
+                          "Plans": [
+                            {
+                              "Plans": [
+                                {
+                                  "Alias": "activity_logs",
+                                  "Filter": "(event_data @> '{\"event_type\": \"play\"}'::jsonb)",
+                                  "Disabled": false,
+                                  "Node Type": "Index Scan",
+                                  "Index Cond": "(user_id = 1)",
+                                  "Index Name": "activity_user_time_idx",
+                                  "Async Capable": false,
+                                  "Relation Name": "activity_logs",
+                                  "Parallel Aware": false,
+                                  "Scan Direction": "Forward",
+                                  "Parent Relationship": "Outer"
+                                }
+                              ],
+                              "Disabled": false,
+                              "Node Type": "Limit",
+                              "Async Capable": false,
+                              "Parallel Aware": false,
+                              "Parent Relationship": "Outer"
+                            },
+                            {
+                              "Alias": "seed",
+                              "Disabled": false,
+                              "Node Type": "Index Scan",
+                              "Index Cond": "(title_id = activity_logs.title_id)",
+                              "Index Name": "titles_pkey",
+                              "Async Capable": false,
+                              "Relation Name": "titles",
+                              "Parallel Aware": false,
+                              "Scan Direction": "Forward",
+                              "Parent Relationship": "Inner"
+                            }
+                          ],
+                          "Disabled": false,
+                          "Join Type": "Inner",
+                          "Node Type": "Nested Loop",
+                          "Inner Unique": true,
+                          "Async Capable": false,
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Outer"
+                        },
+                        {
+                          "Alias": "t",
+                          "Disabled": false,
+                          "Node Type": "Seq Scan",
+                          "Async Capable": false,
+                          "Relation Name": "titles",
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Inner"
+                        }
+                      ],
+                      "Disabled": false,
+                      "Join Type": "Inner",
+                      "Node Type": "Nested Loop",
+                      "Inner Unique": false,
+                      "Async Capable": false,
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Outer"
+                    },
+                    {
+                      "Plans": [
+                        {
+                          "Alias": "watched",
+                          "Filter": "((event_data @> '{\"event_type\": \"play\"}'::jsonb) AND (user_id = 1))",
+                          "Disabled": false,
+                          "Node Type": "Seq Scan",
+                          "Async Capable": false,
+                          "Relation Name": "activity_logs",
+                          "Parallel Aware": false,
+                          "Parent Relationship": "Outer"
+                        }
+                      ],
+                      "Disabled": false,
+                      "Node Type": "Hash",
+                      "Async Capable": false,
+                      "Parallel Aware": false,
+                      "Parent Relationship": "Inner"
+                    }
+                  ],
+                  "Disabled": false,
+                  "Hash Cond": "(t.title_id = watched.title_id)",
+                  "Join Type": "Anti",
+                  "Node Type": "Hash Join",
+                  "Inner Unique": false,
+                  "Async Capable": false,
+                  "Parallel Aware": false,
+                  "Parent Relationship": "Outer"
+                }
+              ],
+              "Disabled": false,
+              "Sort Key": [
+                "((t.embedding <=> seed.embedding))",
+                "t.title_id"
+              ],
+              "Node Type": "Sort",
+              "Async Capable": false,
+              "Parallel Aware": false,
+              "Parent Relationship": "Outer"
+            }
+          ],
+          "Disabled": false,
+          "Node Type": "Limit",
+          "Async Capable": false,
+          "Parallel Aware": false
+        }
+      }
+    ],
+    "query_number": 6
+  }
+]

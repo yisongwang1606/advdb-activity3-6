@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "source": "PostgreSQL server COPY from the authenticated pgAdmin execution",
+  "executed_at_utc": "2026-11-03 18:31:23 UTC",
+  "checks": [
+    "Database, version and row counts",
+    "Teacher vector type / distance / HNSW smoke test",
+    "Two JSONB GIN indexes and one title HNSW index",
+    "All title and phrase vectors have 384 dimensions",
+    "No missing preference arrays or orphan events",
+    "Four invalid-row inserts rejected by database constraints",
+    "JSONB query outputs independently recomputed from synthetic JSON",
+    "Three vector result lists and displayed distances independently recomputed from generated SQL vectors"
+  ],
+  "vector_result_method": "Exhaustive cosine distance over the 60 generated title vectors; Python standard-library double precision; display tolerance 0.000501.",
+  "watched_title_ids_user_1": [
+    1,
+    2,
+    3
+  ],
+  "latest_play_title_id_user_1": 3,
+  "source_sql_sha256": {
+    "ca3_titles_vectors.sql": "009f9c9eb0e81afd41eceae8f1e7891f2774978497301e7597eff1512e79cb5b",
+    "ca3_search_phrases.sql": "f7c70a4fa56478a05f1b6d4cd120395d4a5907ce2c90644196ce9f9e79b31e78"
+  }
+}
