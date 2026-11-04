@@ -12,6 +12,7 @@ A streaming database using PostgreSQL 18.6 and pgvector 0.8.7. It contains 24 sy
 | `notebooks/` | Executed instructor notebook, title CSV and Python dependencies |
 | `results/` | Actual query outputs in CSV and text, execution evidence and query plans |
 | `docs/` | Editable draw.io database diagram, diagram PDF and Windows pgvector setup instructions |
+| `report/` | [Class activity report (PDF)](report/Class%20Activity%20JSONB%20and%20Vector%20Databases%20Document.pdf) |
 | `scripts/` | Synthetic data generator and document generation script |
 
 ## Run
